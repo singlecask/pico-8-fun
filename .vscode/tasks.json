@@ -1,0 +1,23 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run current cart in PICO-8 with console visible",
+            "type": "shell",
+            "osx": {
+            "command": "/Applications/pico-8/PICO-8.app/Contents/MacOS/pico8 -run ${relativeFile}",
+            "options": {
+                "cwd": "${workspaceRoot}",
+            }
+        },
+        "problemMatcher": [],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        }
+      },
+    ]
+  }
+  
