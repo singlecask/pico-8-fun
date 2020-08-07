@@ -20,7 +20,7 @@ function _init()
         stars[i].x = flr(rnd(128))  -- x-coord
         stars[i].y = flr(rnd(128))  -- y-coord
         stars[i].z = 1+flr(rnd(10)) -- z-coord (sort-of)
-        stars[i].r = flr(rnd(4))    -- radius
+        stars[i].d = flr(rnd(5))    -- diameter
         stars[i].c = 1+flr(rnd(15)) -- colour
     end
 
@@ -63,14 +63,15 @@ function _update()
     local dy = speed * sin(direction+starDirectionOffset)
 
     -- update each star
-    for i = 1,nStars do
+    for i = 1,#stars do
         -- apply deltas
         stars[i].x += dx * stars[i].z
         stars[i].y += dy * stars[i].z
 
         -- wrap any stars that are off-screen
-        local min = -stars[i].r
-        local max = 127 + stars[i].r
+        local radius = stars[i].d/2
+        local min = -radius
+        local max = 127 + radius
         if stars[i].x > max then
             stars[i].x = min
         elseif stars[i].x < min then
@@ -88,13 +89,18 @@ function _draw()
     -- clear screen
     cls()
 
+    -- -- draw some stars to check scales
+    -- for i = 0,6 do
+    --     circfill_dia(i*12, 10, i, 3)
+    -- end
+
     -- draw each star
-    for i = 1,nStars do
-        circfill(stars[i].x, stars[i].y, stars[i].r, stars[i].c)
+    for i = 1,#stars do
+        circfill_dia(stars[i].x, stars[i].y, stars[i].d, stars[i].c)
     end
 
     -- draw ship and thruster fire
-    shipDirection = direction+shipDirectionOffset
+    local shipDirection = direction+shipDirectionOffset
     spr_rotated(16, 0, 16, 16, 64, 64, shipDirection)
     if leftThruster then spr_rotated(48, 0, 16, 16, 64, 64, shipDirection) end
     if centreThruster then spr_rotated(32, 0, 16, 16, 64, 64, shipDirection) end
@@ -142,6 +148,27 @@ function spr_rotated(sx,sy,sw,sh,px,py,r)
     end
 end
 
+--[[
+    // Draw a filled circle.
+    // Similar effect to circfill(), but specify diameter instead of radius (thus allowing finer control over size).
+]]
+function circfill_dia(x, y, d, c)
+    local r = d/2
+    local miny = y-r --max(y - r, 0)
+    local maxy = y+r --min(y + r, 127)
+    local minx = x-r --max(x - r, 0)
+    local maxx = x+r --min(x + r, 127)
+    for py=miny,maxy do
+        for px=minx,maxx do
+            -- use Pythagorean theorem to determine if coordinate is within circle
+            local xx = (px - x) * 2
+            local yy = (py - y) * 2
+            if xx*xx + yy*yy <= d*d+d then
+                pset(px,py,c)
+            end
+        end
+    end
+end
 
 __gfx__
 00000000fff6fffffffffff6ffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000
